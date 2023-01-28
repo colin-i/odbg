@@ -20,6 +20,8 @@ void main()
   infile = bfd_openr("a.out",NULL);
 //!=NULL
 
+//You need to call bfd_check_format() on each element in the archive before attempting to process it
+//example bfd_get_symtab_upper_bound will SIGSEGV
 bfd_check_format(infile,bfd_object);
 //true
 
