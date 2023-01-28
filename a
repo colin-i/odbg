@@ -1,0 +1,6 @@
+
+
+#.dynsym .rela.dyn .dynstr .text
+#Entry point address
+#objcopy -O binary --only-section=.text foobar.elf foobar.text
+#objcopy f --update-section .text=foobar.text
