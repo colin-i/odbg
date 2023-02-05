@@ -66,7 +66,7 @@ static void copy_section(bfd*infile,asection*section,void*v){
 
 	//#define bfd_get_section_size_before_reloc(section) \
 	//(section->reloc_done ? (abort(),1): (section)->_raw_size)   //,1 do nothing ,a=1 can be something
-	//long sz=bfd_get_section_size_before_reloc(section);//implicit declaration 
+	//long sz=bfd_get_section_size_before_reloc(section);//implicit declaration
 	long sz;
 	//if(section->reloc_done)abort();//has no member named 'reloc_done'; did you mean 'reloc_count'
 	//else
