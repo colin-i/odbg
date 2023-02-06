@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 static int skip_section(bfd*b,asection*s){
+	return 0;
 //implicit declaration of function ‘bfd_get_section_flags’
 	if(s->flags & SEC_DEBUGGING){
 		printf("bfd flags");
@@ -63,34 +64,39 @@ static void copy_section(bfd*infile,asection*section,void*v){
 	COPYDATA* data=(COPYDATA*)v;
 
 	asection*s=section->output_section;
-
+printf("%s %s\n",section->name,s->name);
 	//#define bfd_get_section_size_before_reloc(section) \
 	//(section->reloc_done ? (abort(),1): (section)->_raw_size)   //,1 do nothing ,a=1 can be something
 	//long sz=bfd_get_section_size_before_reloc(section);//implicit declaration
 	long sz;
 	//if(section->reloc_done)abort();//has no member named 'reloc_done'; did you mean 'reloc_count'
 	//else
-	sz=section->rawsize;//has no member named '_raw_size'; did you mean 'rawsize'
+	//__asm("int $3");
+	sz=section->size;//has no member named '_raw_size'; did you mean 'rawsize' //rawsize is always 0
 
-	long sz_reloc=bfd_get_reloc_upper_bound(infile,section);
+//	long sz_reloc=bfd_get_reloc_upper_bound(infile,section);
 
 	unsigned char*buf;
 
-	if (!sz_reloc){
-		bfd_set_reloc(data->output,s,(arelent**)NULL,0);
-	}else if(sz_reloc>0){//maybe no relocs at -1 error
-		buf=malloc(sz_reloc);
+//	if (!sz_reloc){
+//printf("reloc bound 0\n");
+//exit(1);//never here
+//		bfd_set_reloc(data->output,s,(arelent**)NULL,0);
+//	}else if(sz_reloc>0){//maybe no relocs at -1 error
+//printf("reloc bound>0\n");
+//		buf=malloc(sz_reloc);
 		//!=NULL
-		long count=bfd_canonicalize_reloc(infile,section,(arelent**)buf,data->syms);
-		bfd_set_reloc(data->output,s,(arelent**)(count?buf:NULL),count);
-		free(buf);
-	}
+//		long count=bfd_canonicalize_reloc(infile,section,(arelent**)buf,data->syms);
+//		bfd_set_reloc(data->output,s,(arelent**)(count?buf:NULL),count);
+//		free(buf);
+//	}
 
 	//"for no apparent reason"
 	//section->_cooked_size=sz;//has no member named '_cooked_size'
 	//section->reloc_done=true;
 
 	if(section->flags&SEC_HAS_CONTENTS){
+printf("HAS_CONTENTS %lu\n",sz);
 		buf=malloc(sz);
 		//!=NULL
 		bfd_get_section_contents(infile,section,buf,0,sz);
@@ -115,11 +121,14 @@ bfd*outfile = bfd_openw("b.out",NULL);
 
 //!=NULL
 
-bfd_set_format(outfile,bfd_get_format(infile));
+int format=bfd_get_format(infile);
+bfd_set_format(outfile,format);
 
-bfd_set_arch_mach(outfile,bfd_get_arch(infile),bfd_get_mach(infile));
+int arch=bfd_get_arch(infile);
+int mach=bfd_get_mach(infile);
+bfd_set_arch_mach(outfile,arch,mach);
 
-bfd_set_file_flags(outfile,bfd_get_file_flags(infile)&bfd_applicable_file_flags(outfile));
+bfd_set_file_flags(outfile,bfd_get_file_flags(infile));//&bfd_applicable_file_flags(outfile)
 
 bfd_set_start_address(outfile,bfd_get_start_address(infile));
 
