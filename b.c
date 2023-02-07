@@ -30,7 +30,7 @@ static int skip_section(bfd*b,asection*s){
 	}
 	return 0;
 }
-
+int one=0;
 static void define_section(bfd*infile,asection*section,void*v){
 	if(skip_section(infile,section))return;
 
@@ -45,11 +45,29 @@ static void define_section(bfd*infile,asection*section,void*v){
 	s->lma=section->lma;
 	s->alignment_power=section->alignment_power;
 	bfd_set_section_flags(s,section->flags);//outfile,
+
 	//link output to input. needed at copy
 	section->output_section=s;
 	//
 	section->output_offset=0;
 	bfd_copy_private_section_data(infile,section,outfile,s);
+
+
+if(section->flags==283){
+one++;if(one==5){
+asection* s2=bfd_make_section(outfile,".text2");
+//!=NULL
+//bfd_perror(NULL);
+//asection*prev=bfd_get_section_by_name(infile, ".text");
+s2->alignment_power=section->alignment_power;
+//bfd_set_section_size(s,bfd_section_size(section));
+s2->vma=section->vma;
+s2->lma=section->lma;
+bfd_set_section_flags(s2,section->flags);
+bfd_copy_private_section_data(infile,section,outfile,s2);//important
+bfd_perror(NULL);
+}}
+
 }
 
 typedef struct{
@@ -64,7 +82,7 @@ static void copy_section(bfd*infile,asection*section,void*v){
 	COPYDATA* data=(COPYDATA*)v;
 
 	asection*s=section->output_section;
-printf("%s %s\n",section->name,s->name);
+printf("%s %u\n",section->name,section->flags);
 	//#define bfd_get_section_size_before_reloc(section) \
 	//(section->reloc_done ? (abort(),1): (section)->_raw_size)   //,1 do nothing ,a=1 can be something
 	//long sz=bfd_get_section_size_before_reloc(section);//implicit declaration
@@ -96,7 +114,7 @@ printf("%s %s\n",section->name,s->name);
 	//section->reloc_done=true;
 
 	if(section->flags&SEC_HAS_CONTENTS){
-printf("HAS_CONTENTS %lu\n",sz);
+//printf("HAS_CONTENTS %lu\n",sz);
 		buf=malloc(sz);
 		//!=NULL
 		bfd_get_section_contents(infile,section,buf,0,sz);
