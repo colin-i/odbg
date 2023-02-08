@@ -4,18 +4,12 @@
 
   Demonstration code; shows how to trace the system calls in a child
   process with ptrace.  Only works on 64-bit x86 Linux for now, I'm
-  afraid.  (Even worse, it's only tested on Linux 2.6....) 
- 
-  The callname() function looks clunky and machine-generated because it
-  *is* clunky and machine-generated.
+  afraid.
 
   I got inspiration and a starting point from this old LJ article:
-    http://www.linuxjournal.com/article/6100 
+    http://www.linuxjournal.com/article/6100
 
   I release this code to the public domain.  Share and enjoy.
-
-  Will Benton
-  Madison, 2008
 */
 
 #include <sys/ptrace.h>
@@ -37,7 +31,7 @@
 //#define REG(reg) reg.orig_eax
 //#endif
 
-int main(int argc, char* argv[]) {   
+int main(int argc, char* argv[]) {
   pid_t child;
 
   if (argc == 1) {
@@ -62,7 +56,7 @@ int main(int argc, char* argv[]) {
 
     while(waitpid(child, &status, 0) && ! WIFEXITED(status)) {
 //usleep(100000);
-      struct user_regs_struct regs; 
+      struct user_regs_struct regs;
       ptrace(PTRACE_GETREGS, child, NULL, &regs);
       //fprintf(stderr, "system call %s from pid %d\n", callname(REG(regs)), child);
 if(REG(regs)==-1)
