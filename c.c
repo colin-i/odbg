@@ -31,6 +31,8 @@
 //#define REG(reg) reg.orig_eax
 //#endif
 
+#define SHOW(call) ({ int _ret = (int)(call); printf("%s -> %d\n", #call, _ret); if (_ret < 0) { perror(NULL); }})
+
 int main(int argc, char* argv[]) {
   pid_t child;
 
@@ -59,8 +61,10 @@ int main(int argc, char* argv[]) {
       struct user_regs_struct regs;
       ptrace(PTRACE_GETREGS, child, NULL, &regs);
       //fprintf(stderr, "system call %s from pid %d\n", callname(REG(regs)), child);
-if(REG(regs)==-1)
+if(REG(regs)==-1){
       printf("%lld \n", REG(regs));
+	SHOW(ptrace(PTRACE_POKETEXT, child, 0x1160, 0x90909090909090cc));
+}
       ptrace(PTRACE_SYSCALL, child, NULL, NULL);//tested
     }
   }
