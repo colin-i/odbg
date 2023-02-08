@@ -26,7 +26,7 @@
 //const char* callname(long call);
 
 //#if __WORDSIZE == 64
-#define REG(reg) reg.orig_rax
+//#define REG(reg) reg.orig_rax
 //#else
 //#define REG(reg) reg.orig_eax
 //#endif
@@ -52,19 +52,25 @@ int main(int argc, char* argv[]) {
   child = fork();
   if(child == 0) {
     ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-    execvp(chargs[0], chargs);
+    execv(chargs[0], chargs);
+//printf("%s",changedata);
   } else {
     int status;
-
+int a=0;
     while(waitpid(child, &status, 0) && ! WIFEXITED(status)) {
 //usleep(100000);
       struct user_regs_struct regs;
       ptrace(PTRACE_GETREGS, child, NULL, &regs);
       //fprintf(stderr, "system call %s from pid %d\n", callname(REG(regs)), child);
-if(REG(regs)==-1){
-      printf("%lld \n", REG(regs));
-	SHOW(ptrace(PTRACE_POKETEXT, child, 0x1160, 0x90909090909090cc));
-}
+      printf("%llx \n", regs.rip);
+//PTRACE_GETSIGINFO
+if(regs.orig_rax==-1){
+      printf("is 0xcc \n");
+if(a==0){
+a=1;
+	SHOW(ptrace(PTRACE_POKETEXT, child, regs.rip, 0x90909090909090cc));//0xcc is at start
+	//data is in same virtual address difference than text
+}}
       ptrace(PTRACE_SYSCALL, child, NULL, NULL);//tested
     }
   }
