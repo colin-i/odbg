@@ -72,7 +72,7 @@ bfd_perror(NULL);
 
 typedef struct{
 	bfd*output;
-	asymbol**syms;
+	//asymbol**syms;
 	//int sz_syms,count_syms;
 }COPYDATA;
 
@@ -152,25 +152,33 @@ bfd_set_start_address(outfile,bfd_get_start_address(infile));
 
 bfd_map_over_sections(infile,define_section,outfile);
 
-/*asymbol *new;
-new = bfd_make_empty_symbol(abfd);
+/*
+asymbol *new;
+new = bfd_make_empty_symbol(outfile);
 new->name = "dummy_symbol";
-new->section = bfd_get_section_by_name(abfd, ".text");
+new->section = bfd_get_section_by_name(outfile, ".text");
 new->flags = BSF_GLOBAL;
 new->value = 0x12345;
-*/
+
+
 long storage_needed = bfd_get_symtab_upper_bound(infile);
-//storage_needed+=sizeof(asymbol*);
+
+storage_needed+=sizeof(asymbol*);
+
 asymbol **syms= malloc(storage_needed);
 //!=NULL
 
 long count=bfd_canonicalize_symtab(infile, syms);
 
-//count++;
+count++;
+syms[count-1]=new;
+syms[count]=(asymbol*)0;
 
   bfd_set_symtab(outfile, syms, count);
+*/
 
-COPYDATA dt;dt.output=outfile;dt.syms=syms;
+COPYDATA dt;dt.output=outfile;
+//dt.syms=syms;
 //dt.sz_syms=storage_needed;dt.count_syms=count;
 bfd_map_over_sections(infile,copy_section,&dt);
 
