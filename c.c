@@ -17,7 +17,7 @@
 #include <sys/wait.h>
 #include <sys/user.h>
 
-//#include <syscall.h>
+#include <syscall.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -61,16 +61,29 @@ int a=0;
 //usleep(100000);
       struct user_regs_struct regs;
       ptrace(PTRACE_GETREGS, child, NULL, &regs);
-      //fprintf(stderr, "system call %s from pid %d\n", callname(REG(regs)), child);
-      printf("%llx \n", regs.rip);
+
+struct user* user_space = (struct user*)0;
+long long unsigned*addr=&user_space->regs.orig_rax;
+long long unsigned start_code = ptrace(PTRACE_PEEKUSER, child, addr, NULL);
+
+long aa=regs.orig_rax;
+      printf("system call %llx %llx\n",regs.rip,start_code);// %s", callname(aa)
+//      printf("%llx \n", regs.rip);
 //PTRACE_GETSIGINFO
 if(regs.orig_rax==-1){
       printf("is 0xcc \n");
-if(a==0){
-a=1;
-	SHOW(ptrace(PTRACE_POKETEXT, child, regs.rip, 0x90909090909090cc));//0xcc is at start
-	//data is in same virtual address difference than text
-}}
+	if(a==0){
+		a=1;
+		SHOW(ptrace(PTRACE_POKETEXT, child, regs.rip, 0x90909090909090cc));//0xcc is at start
+		//data is in same virtual address difference than text
+	}
+}else if(regs.orig_rax==0xb){
+	char qwer[100];
+	sprintf(qwer,"cat /proc/%u/maps",child);
+	//printf(qwer);
+	system(qwer);
+	//sleep(20);
+}
       ptrace(PTRACE_SYSCALL, child, NULL, NULL);//tested
     }
   }
