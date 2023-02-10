@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#include <signal.h>
+
 //const char* callname(long call);
 
 //#if __WORDSIZE == 64
@@ -59,32 +61,64 @@ int main(int argc, char* argv[]) {
 int a=0;
     while(waitpid(child, &status, 0) && ! WIFEXITED(status)) {
 //usleep(100000);
-      struct user_regs_struct regs;
-      ptrace(PTRACE_GETREGS, child, NULL, &regs);
+//      struct user_regs_struct regs;
+//      ptrace(PTRACE_GETREGS, child, NULL, &regs);
 
 struct user* user_space = (struct user*)0;
 long long unsigned*addr=&user_space->regs.orig_rax;
-long long unsigned start_code = ptrace(PTRACE_PEEKUSER, child, addr, NULL);
+long long unsigned orig_rax = ptrace(PTRACE_PEEKUSER, child, addr, NULL);
+addr=&user_space->regs.rip;
+long rip=ptrace(PTRACE_PEEKUSER, child, addr, NULL);
+//long aa=regs.orig_rax;
+      printf("system call %lx %llx\n",rip,orig_rax);// %s", callname(aa)
+//      printf("system call %lx %llx %s\n",rip,orig_rax,callname(orig_rax));
 
-long aa=regs.orig_rax;
-      printf("system call %llx %llx\n",regs.rip,start_code);// %s", callname(aa)
-//      printf("%llx \n", regs.rip);
-//PTRACE_GETSIGINFO
-if(regs.orig_rax==-1){
-      printf("is 0xcc \n");
-	if(a==0){
-		a=1;
-		SHOW(ptrace(PTRACE_POKETEXT, child, regs.rip, 0x90909090909090cc));//0xcc is at start
-		//data is in same virtual address difference than text
-	}
-}else if(regs.orig_rax==0xb){
+if(orig_rax==0x3b){
 	char qwer[100];
-	sprintf(qwer,"cat /proc/%u/maps",child);
+	sprintf(qwer,"cat /proc/%u/maps | head -1 | cut -d'-' -f1",child);//cut -d' ' -f1 | 
+
+  FILE *fp;
+  char path[100];
+
+  /* Open the command for reading. */
+  fp = popen(qwer, "r");
+  if (fp == NULL) {
+    printf("Failed to run command\n" );
+    exit(1);
+  }
+
+  /* Read the output a line at a time - output it. */
+//  while (
+fgets(path, sizeof(path), fp);
+// != NULL) { 
+//printf("%s", path);
+//  }
+  /* close */
+  pclose(fp);
 	//printf(qwer);
-	system(qwer);
+	//system(qwer);//all sections are from the first call(execve)
 	//sleep(20);
+sscanf(path,"%lx",&rip);
+rip+=0x1160;
+printf("%lx", rip);
+	SHOW(ptrace(PTRACE_POKETEXT, child, rip, 0x90909090909090cc));//0xcc is at start
 }
-      ptrace(PTRACE_SYSCALL, child, NULL, NULL);//tested
+//      printf("%llx \n", regs.rip);
+
+//siginfo_t ss;
+//SHOW(ptrace(PTRACE_GETSIGINFO, child, NULL, &ss));
+
+if(orig_rax==-1){//
+      printf("is 0xcc \n");
+//	if(a==0){
+//		a=1;
+//		SHOW(ptrace(PTRACE_POKETEXT, child, rip, 0x90909090909090cc));//0xcc is at start
+		//regs.rip
+		//data is in same virtual address difference than text
+//	}
+}
+//      ptrace(PTRACE_SYSCALL, child, NULL, NULL);//tested
+      ptrace(PTRACE_CONT, child, NULL, NULL);//this is one execve(0x3b) and -1(the i3)
     }
   }
   return 0;
