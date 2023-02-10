@@ -75,7 +75,7 @@ long rip=ptrace(PTRACE_PEEKUSER, child, addr, NULL);
 
 if(orig_rax==0x3b){
 	char qwer[100];
-	sprintf(qwer,"cat /proc/%u/maps | head -1 | cut -d'-' -f1",child);//cut -d' ' -f1 | 
+	sprintf(qwer,"cat /proc/%u/maps | head -1 | cut -d'-' -f1",child);//cut -d' ' -f1 |
 
   FILE *fp;
   char path[100];
@@ -90,7 +90,7 @@ if(orig_rax==0x3b){
   /* Read the output a line at a time - output it. */
 //  while (
 fgets(path, sizeof(path), fp);
-// != NULL) { 
+// != NULL) {
 //printf("%s", path);
 //  }
   /* close */
