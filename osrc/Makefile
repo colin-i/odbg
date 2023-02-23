@@ -3,37 +3,40 @@ OCOMP=o
 OLINK=ounused
 syms=-s
 
-all: odbg
+name=libodbg.so
+outname=/lib/${name}
 
-items = main
+all: ${name}
+
+items = init
 
 $(foreach var,$(items),$(eval obs += ${var}.o))
 $(foreach var,$(items),$(eval logs += ${var}.s.log))
 
-odbg: ${obs}
+libodbg.so: ${obs}
 	${OLINK} ${logs}
 	@echo
-	$(CC) ${syms} ${obs} -o odbg -lcdk -L../osrc -lodbg
+	$(CC) ${syms} ${obs} -shared -o ${name}
 
 %.o: %.s
 	${OCOMP} $< ${OFLAGS}
 
 install: all
-	install -D odbg \
-		$(DESTDIR)$(prefix)/bin/odbg
+	install -D ${name} \
+		$(DESTDIR)$(prefix)${outname}
 
 clean-compile:
 	-printf ' %s.s.log' ${items} | xargs rm -f
 	-printf ' %s.o' ${items} | xargs rm -f
 
 clean-link:
-	-rm -f odbg
+	-rm -f ${name}
 
 clean: clean-compile clean-link
 distclean: clean
 
 uninstall:
-	-rm -f $(DESTDIR)$(prefix)/bin/odbg
+	-rm -f $(DESTDIR)$(prefix)${outname}
 
 test:
 	echo "Nothing"

@@ -1,0 +1,2 @@
+
+LD_LIBRARY_PATH=../osrc edb --run ./odbg ${1}

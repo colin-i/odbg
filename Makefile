@@ -1,7 +1,7 @@
 
 TOPTARGETS := all install clean distclean uninstall test
 
-SUBDIRS := src
+SUBDIRS := osrc src
 
 $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
