@@ -1,9 +1,10 @@
 
 format elfobj64
 
+include "../include/common.h"
+
 const TRUE=1
 const FALSE=0
-const NULL=0
 
 importx "initCDKScreen" initCDKScreen
 importx "destroyCDKScreen" destroyCDKScreen

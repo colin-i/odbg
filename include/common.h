@@ -1,0 +1,2 @@
+
+const NULL=0
