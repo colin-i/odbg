@@ -7,6 +7,7 @@ const PTRACE_TRACEME=0
 const dwordstr=10
 const asciiminus=0x2D
 
+#-1 or differenet
 functionx odbg_init(sv argv)
 	#vfork is not cloning the memory like fork, but same 0,pid return and maybe same -1 error
 
@@ -73,14 +74,20 @@ function stop_at_entry(sd proc)
 		#This  buffer  should  be freed by the user program even if getline() failed
 
 		importx "getdelim" getdelim
-		sd ret;setcall ret getdelim(#line,#size,(asciiminus),file)
+		ss ret;setcall ret getdelim(#line,#size,(asciiminus),file)
 		if ret!=-1
 #importx "printf" printf
 #call printf(line)
 #chars qwe={10,0}
 #call printf(#qwe)
+			importx "sscanf" sscanf
+			sd rip
+			call sscanf(line,"%lx",#rip) #the "ordinary character" - is after %lx
+			dec ret
+			add ret line
+#call printf("%lx",rip)
+#call printf(#qwe)
 
-#sscanf(path,"%lx",&rip);
 #rip+=0x1160;entry point with simple read predefined or bfd
 #printf("%lx", rip);
 #	SHOW(ptrace(PTRACE_POKETEXT, child, rip, 0x90909090909090cc));//0xcc is at start
