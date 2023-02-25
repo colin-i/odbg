@@ -6,8 +6,11 @@ include "init.h"
 include "../include/common.h"
 
 const PTRACE_TRACEME=0
+#const PTRACE_POKETEXT=4
+const PTRACE_CONT=7
 const dwordstr=10
 const asciiminus=0x2D
+const SEEK_SET=0
 
 #-1 or different
 functionx odbg_init(sv argv)
@@ -33,35 +36,49 @@ functionx odbg_init(sv argv)
 				importx "__environ" environ
 				sv env^environ
 				call execve(argv#,argv,env#)
-			else
-				importx "_exit" exit
+			endif
 
-				call exit(0) #we are ignoring first argument since it is not used here
-				#same like at ptrace+exit status is not ignored inside
-			endelse
-		else
-			datax status#1
-			sd proc;set proc ret
+			importx "_exit" exit
+			call exit(0) #we are ignoring first argument since it is not used here
+			#same like at ptrace+exit status is not ignored inside
+		endif
 
-			importx "waitpid" waitpid
+		datax status#1
+		sd proc;set proc ret
 
-			setcall ret waitpid(proc,#status,0)  #WNOHANG 1
-			if ret!=-1
-				and status 0x7f
-				if status!=0
-					#orig_rax==0x3b  execve
-					setcall ret stop_at_entry(proc)
+		importx "waitpid" waitpid
+
+		setcall ret waitpid(proc,#status,0)  #WNOHANG 1
+		if ret!=-1
+			and status 0x7f
+			if status!=0
+				#orig_rax==0x3b  execve
+				setcall ret trap_at_entry(proc,argv#)
+				if ret!=-1
+					setcall ret waitpid(proc,#status,0)
+					if ret!=-1
+						and status 0x7f
+						if status!=0
+						#	importx "printf" p;call p("x");chars qwe={10,0};call p(#qwe)
+						else
+							return -1
+						endelse
+					else
+						return -1
+					endelse
 				else
 					return -1
 				endelse
-			endif
-		endelse
+			else
+				return -1
+			endelse
+		endif
 	endif
 
 	return ret
 endfunction
-
-function stop_at_entry(sd proc)
+#same
+function trap_at_entry(sd proc,sd fname)
 	charsx buf#1+4+1+dwordstr+1+4+1
 
 	importx "sprintf" sprintf
@@ -82,20 +99,17 @@ function stop_at_entry(sd proc)
 			sd rip
 			call sscanf(line,"%lx",#rip) #the "ordinary character" - is after %lx
 
-#rip+=0x1160;entry point with simple read predefined or bfd
-#Elf64_Ehdr_e_entry
-
-#importx "printf" printf
-#call printf(line)
-#chars qwe={10,0}
-#call printf(#qwe)
-
-#printf("%lx", rip);
-#	SHOW(ptrace(PTRACE_POKETEXT, child, rip, 0x90909090909090cc));//0xcc is at start
-
-#ptrace(PTRACE_CONT, child, NULL, NULL);//PTRACE_SYSCALL will have many interrupts
-
-#wait
+			setcall ret add_elf_entry(fname,#rip)
+			if ret!=-1
+				sd a=0xcc;sd b^a;inc b
+				importx "memset" memset
+				call memset(b,0x90,(:-1))
+				setcall ret ptrace((PTRACE_POKETEXT),proc,rip,a)
+				if ret!=-1
+					setcall ret ptrace((PTRACE_CONT),proc,(NULL),(NULL))
+					#PTRACE_SYSCALL will have many interrupts
+				endif
+			endif
 		endif
 
 		importx "free" free
@@ -106,5 +120,27 @@ function stop_at_entry(sd proc)
 		return ret
 	endif
 
+	return -1
+endfunction
+#same
+function add_elf_entry(sd fname,sv prip)
+	sd f;setcall f fopen(fname,"rb")
+	if f!=(NULL)
+		sd ret
+		importx "fseek" fseek
+		setcall ret fseek(f,(Elf64_Ehdr_e_entry),(SEEK_SET))
+		if ret!=-1
+			sd entry
+			importx "fread" fread
+			sd sz;setcall sz fread(#entry,:,1,f)
+			if sz==1
+				add prip# entry
+			else
+				set ret -1
+			endelse
+		endif
+		call fclose(f)
+		return ret
+	endif
 	return -1
 endfunction
