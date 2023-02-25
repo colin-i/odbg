@@ -1,7 +1,15 @@
 
+ifndef OCOMP
 OCOMP=o
+endif
+
+ifndef OLINK
 OLINK=ounused
+endif
+
+ifndef syms
 syms=-s
+endif
 
 name=libodbg.so
 outname=/lib/${name}
