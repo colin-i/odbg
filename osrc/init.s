@@ -74,7 +74,7 @@ function stop_at_entry(sd proc)
 		#This  buffer  should  be freed by the user program even if getline() failed
 
 		importx "getdelim" getdelim
-		ss ret;setcall ret getdelim(#line,#size,(asciiminus),file)
+		sd ret;setcall ret getdelim(#line,#size,(asciiminus),file)
 		if ret!=-1
 #importx "printf" printf
 #call printf(line)
@@ -83,8 +83,6 @@ function stop_at_entry(sd proc)
 			importx "sscanf" sscanf
 			sd rip
 			call sscanf(line,"%lx",#rip) #the "ordinary character" - is after %lx
-			dec ret
-			add ret line
 #call printf("%lx",rip)
 #call printf(#qwe)
 
