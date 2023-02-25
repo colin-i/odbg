@@ -1,13 +1,15 @@
 
 format elfobj64
 
+include "init.h"
+
 include "../include/common.h"
 
 const PTRACE_TRACEME=0
 const dwordstr=10
 const asciiminus=0x2D
 
-#-1 or differenet
+#-1 or different
 functionx odbg_init(sv argv)
 	#vfork is not cloning the memory like fork, but same 0,pid return and maybe same -1 error
 
@@ -76,17 +78,18 @@ function stop_at_entry(sd proc)
 		importx "getdelim" getdelim
 		sd ret;setcall ret getdelim(#line,#size,(asciiminus),file)
 		if ret!=-1
+			importx "sscanf" sscanf
+			sd rip
+			call sscanf(line,"%lx",#rip) #the "ordinary character" - is after %lx
+
+#rip+=0x1160;entry point with simple read predefined or bfd
+#Elf64_Ehdr_e_entry
+
 #importx "printf" printf
 #call printf(line)
 #chars qwe={10,0}
 #call printf(#qwe)
-			importx "sscanf" sscanf
-			sd rip
-			call sscanf(line,"%lx",#rip) #the "ordinary character" - is after %lx
-#call printf("%lx",rip)
-#call printf(#qwe)
 
-#rip+=0x1160;entry point with simple read predefined or bfd
 #printf("%lx", rip);
 #	SHOW(ptrace(PTRACE_POKETEXT, child, rip, 0x90909090909090cc));//0xcc is at start
 
