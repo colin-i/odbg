@@ -6,7 +6,8 @@ include "init.h"
 include "../include/common.h"
 
 const PTRACE_TRACEME=0
-#const PTRACE_POKETEXT=4
+const PTRACE_PEEKTEXT=1
+const PTRACE_POKETEXT=4
 const PTRACE_CONT=7
 const dwordstr=10
 const asciiminus=0x2D
@@ -29,6 +30,7 @@ functionx odbg_init(sv argv)
 			#"pid, addr, and data are ignored."
 			#on conv64 is not required to pass them but on 32 an implementation can overwrite them and pass them further
 			#it's better to mimic c and pass them all instead of divide them further for 64, for understandability
+			#glibc says ptrace is variadic (arg1,...) but man: long ptrace(enum __ptrace_request request, pid_t pid, void *addr, void *data)
 
 			if ret!=-1
 				#will return to parent at this call, child will never return
@@ -43,39 +45,31 @@ functionx odbg_init(sv argv)
 			#same like at ptrace+exit status is not ignored inside
 		endif
 
-		datax status#1
 		sd proc;set proc ret
 
-		importx "waitpid" waitpid
-
-		setcall ret waitpid(proc,#status,0)  #WNOHANG 1
+		setcall ret wait_pid(proc)
 		if ret!=-1
-			and status 0x7f
-			if status!=0
-				#orig_rax==0x3b  execve
-				setcall ret trap_at_entry(proc,argv#)
-				if ret!=-1
-					setcall ret waitpid(proc,#status,0)
-					if ret!=-1
-						and status 0x7f
-						if status!=0
-						#	importx "printf" p;call p("x");chars qwe={10,0};call p(#qwe)
-						else
-							return -1
-						endelse
-					else
-						return -1
-					endelse
-				else
-					return -1
-				endelse
-			else
-				return -1
-			endelse
+			#orig_rax==0x3b  execve
+			setcall ret trap_at_entry(proc,argv#)
 		endif
 	endif
 
 	return ret
+endfunction
+#same
+function wait_pid(sd proc)
+	datax status#1
+	sd ret
+	importx "waitpid" waitpid
+	setcall ret waitpid(proc,#status,0)  #WNOHANG 1
+	if ret!=-1
+		and status 0x7f
+		if status!=0
+			return ret
+		endif
+		return -1
+	endif
+	return -1
 endfunction
 #same
 function trap_at_entry(sd proc,sd fname)
@@ -101,14 +95,7 @@ function trap_at_entry(sd proc,sd fname)
 
 			setcall ret add_elf_entry(fname,#rip)
 			if ret!=-1
-				sd a=0xcc;sd b^a;inc b
-				importx "memset" memset
-				call memset(b,0x90,(:-1))
-				setcall ret ptrace((PTRACE_POKETEXT),proc,rip,a)
-				if ret!=-1
-					setcall ret ptrace((PTRACE_CONT),proc,(NULL),(NULL))
-					#PTRACE_SYSCALL will have many interrupts
-				endif
+				setcall ret break_at_entry(proc,rip)
 			endif
 		endif
 
@@ -140,6 +127,33 @@ function add_elf_entry(sd fname,sv prip)
 			endelse
 		endif
 		call fclose(f)
+		return ret
+	endif
+	return -1
+endfunction
+#same
+function break_at_entry(sd proc,sd rip)
+	importx "__errno_location" errno
+	#errno = 0;
+	sd err;setcall err errno()
+	set err# 0
+	sd back
+	setcall back ptrace((PTRACE_PEEKTEXT),proc,rip,0)
+	if err#==0
+		sd ret
+		#call memset(b,0x90,(:-1))
+		setcall ret ptrace((PTRACE_POKETEXT),proc,rip,(0xcc))
+		if ret!=-1
+			setcall ret ptrace((PTRACE_CONT),proc,(NULL),(NULL))
+			#PTRACE_SYSCALL will have many interrupts
+			if ret!=-1
+				setcall ret wait_pid(proc)
+				if ret!=-1
+					setcall ret ptrace((PTRACE_POKETEXT),proc,rip,back)
+					#importx "printf" p;call p("x");chars qwe={10,0};call p(#qwe)
+				endif
+			endif
+		endif
 		return ret
 	endif
 	return -1
