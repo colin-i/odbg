@@ -13,28 +13,36 @@ endif
 
 name=libodbg.so
 outname=/lib/${name}
+exte=libexte.a
+prebin=pre.out
+#prebin can't be a.out, will be removed
 
 all: ${name}
 
-precompile = init
+precompile = init1
 
 items = init
+aritems = init1
 
 $(foreach var,$(precompile),$(eval pre += ${var}.h))
-
+$(foreach var,$(aritems),$(eval aobs += ${var}.o))
+$(foreach var,$(aritems),$(eval alogs += ${var}.s.log))
 $(foreach var,$(items),$(eval obs += ${var}.o))
 $(foreach var,$(items),$(eval logs += ${var}.s.log))
 
-libodbg.so: a.out ${pre} ${obs}
-	${OLINK} ${logs}
+${name}: ${exte} ${obs}
+	${OLINK} ${alogs} ${logs}
 	@echo
-	$(CC) ${syms} ${obs} -shared -o ${name}
+	$(CC) ${syms} ${obs} -shared -o ${name} -L. -l:${exte} -Wl,--exclude-libs ${exte}
 
-a.out:
-	$(CC) a.c
+${exte}: ${prebin} ${pre} ${aobs}
+	$(AR) cr ${exte} ${aobs}
+
+${prebin}:
+	$(CC) a.c -o ${prebin}
 
 %.h: %.pre
-	./a.out $^ $*
+	./${prebin} $^ $*
 
 %.o: %.s
 	${OCOMP} $< ${OFLAGS}
@@ -44,12 +52,15 @@ install: all
 		$(DESTDIR)$(prefix)${outname}
 
 clean-compile:
-	-rm -f a.out
-	-printf ' %s.h' ${precompile} | xargs rm -f
-	-printf ' %s.o' ${items} | xargs rm -f
-	-printf ' %s.s.log' ${items} | xargs rm -f
+	-rm -f ${prebin}
+	-rm -f ${pre}
+	-rm -f ${aobs}
+	-rm -f ${alogs}
+	-rm -f ${obs}
+	-rm -f ${logs}
 
 clean-link:
+	-rm -f ${exte}
 	-rm -f ${name}
 
 clean: clean-compile clean-link

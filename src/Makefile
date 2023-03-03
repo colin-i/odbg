@@ -31,8 +31,8 @@ install: all
 		$(DESTDIR)$(prefix)/bin/odbg
 
 clean-compile:
-	-printf ' %s.s.log' ${items} | xargs rm -f
-	-printf ' %s.o' ${items} | xargs rm -f
+	-rm -f ${logs}
+	-rm -f ${obs}
 
 clean-link:
 	-rm -f odbg
