@@ -99,13 +99,22 @@ function break_at_entry(sd proc,sd rip)
 	if err#==0
 		sd ret
 		#call memset(b,0x90,(:-1))
-		setcall ret ptrace((PTRACE_POKETEXT),proc,rip,(0xcc))
+
+		#back is a 64 word on 8 bytes, set only first byte
+		charsx minimumback#1;set minimumback back
+		chars breakpoint=0xcc
+		or back breakpoint;and back breakpoint
+
+		setcall ret ptrace((PTRACE_POKETEXT),proc,rip,back)
 		if ret!=-1
 			setcall ret ptrace((PTRACE_CONT),proc,(NULL),(NULL))
 			#PTRACE_SYSCALL will have many interrupts
 			if ret!=-1
 				setcall ret wait_pid(proc)
 				if ret!=-1
+					#restore back
+					or back minimumback;and back minimumback
+
 					setcall ret ptrace((PTRACE_POKETEXT),proc,rip,back)
 					#importx "printf" p;call p("x");chars qwe={10,0};call p(#qwe)
 				endif
