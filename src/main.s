@@ -1,7 +1,7 @@
 
 #!
 o language debugger
-cdk gui
+cdk cui
 !
 
 format elfobj64
