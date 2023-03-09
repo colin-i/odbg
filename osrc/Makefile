@@ -15,14 +15,14 @@ name=libodbg.so
 outname=/lib/${name}
 exte=libexte.a
 prebin=pre.out
-#prebin can't be a.out, will be removed
+#there is a.out in pre.out run
 
 all: ${name}
 
-precompile = init1
+precompile = elf
 
 items = init
-aritems = init1
+aritems = init1 init2
 
 $(foreach var,$(precompile),$(eval pre += ${var}.h))
 $(foreach var,$(aritems),$(eval aobs += ${var}.o))
@@ -42,7 +42,8 @@ ${prebin}:
 	$(CC) a.c -o ${prebin}
 
 %.h: %.pre
-	./${prebin} $^ $*
+	#./${prebin} $^ $*
+	./${prebin} $^ $@
 
 %.o: %.s
 	${OCOMP} $< ${OFLAGS}

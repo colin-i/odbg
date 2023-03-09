@@ -43,6 +43,10 @@ functionx odbg_init(sv argv)
 			#orig_rax==0x3b  execve
 			import "trap_at_entry" trap_at_entry
 			setcall ret trap_at_entry(proc,argv#)
+			if ret!=-1
+				import "collect_program" collect_program
+				setcall ret collect_program(argv#)
+			endif
 		endif
 	endif
 

@@ -1,4 +1,9 @@
 
+#!
+o language debugger
+cdk gui
+!
+
 format elfobj64
 
 include "../include/common.h"

@@ -1,16 +1,14 @@
 
 format elfobj64
 
-include "init1.h"
+include "elf.h"
 
 include "../include/common.h"
+include "common.h"
 
 const PTRACE_PEEKTEXT=1
 const PTRACE_POKETEXT=4
 const PTRACE_CONT=7
-const dwordstr=10
-const asciiminus=0x2D
-const SEEK_SET=0
 
 #same
 function wait_pid(sd proc)

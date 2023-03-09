@@ -1,0 +1,7 @@
+elf.h
+Elf64_Ehdr
+e_entry
+e_shoff
+e_shentsize
+e_shnum
+e_shstrndx
