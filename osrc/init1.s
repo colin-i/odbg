@@ -27,7 +27,7 @@ function wait_pid(sd proc)
 endfunction
 #same
 function trap_at_entry(sd proc,sd fname)
-	charsx buf#1+4+1+dwordstr+1+4+1
+	charx buf#1+4+1+dwordstr+1+4+1
 
 	importx "sprintf" sprintf
 	importx "fopen" fopen
@@ -99,8 +99,8 @@ function break_at_entry(sd proc,sd rip)
 		#call memset(b,0x90,(:-1))
 
 		#back is a 64 word on 8 bytes, set only first byte
-		charsx minimumback#1;set minimumback back
-		chars breakpoint=0xcc
+		charx minimumback#1;set minimumback back
+		char breakpoint=0xcc
 		or back breakpoint;and back breakpoint
 
 		setcall ret ptrace((PTRACE_POKETEXT),proc,rip,back)
@@ -114,7 +114,7 @@ function break_at_entry(sd proc,sd rip)
 					or back minimumback;and back minimumback
 
 					setcall ret ptrace((PTRACE_POKETEXT),proc,rip,back)
-					#importx "printf" p;call p("x");chars qwe={10,0};call p(#qwe)
+					#importx "printf" p;call p("x");char qwe={10,0};call p(#qwe)
 				endif
 			endif
 		endif

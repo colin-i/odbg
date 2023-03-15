@@ -26,7 +26,7 @@ importx "odbg_init" odbg_init
 entry main(sd argc,sv argv)
 	if argc<2
 		call printf("Usage: odbg program")
-		chars n={10,0}
+		char n={10,0}
 		call printf(#n)
 	else
 		incst argv
