@@ -33,17 +33,17 @@ function collect_program2(sd f)
 		if sz==1
 			setcall ret fseek(f,(Elf64_Ehdr_e_shentsize),(SEEK_SET))
 			if ret!=-1
-				sd section_size=0
+				data section_size=0   #high part will always be 0, words?
 				setcall sz fread(#section_size,(wsz),1,f)
 				if sz==1
 					setcall ret fseek(f,(Elf64_Ehdr_e_shnum),(SEEK_SET))
 					if ret!=-1
-						sd number_of_sections=0
+						data number_of_sections=0
 						setcall sz fread(#number_of_sections,(wsz),1,f)
 						if sz==1
 							setcall ret fseek(f,(Elf64_Ehdr_e_shstrndx),(SEEK_SET))
 							if ret!=-1
-								sd strings_index=0
+								data strings_index=0
 								setcall sz fread(#strings_index,(wsz),1,f)
 								if sz==1
 								endif
