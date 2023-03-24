@@ -46,6 +46,10 @@ function collect_program2(sd f)
 								data strings_index=0
 								setcall sz fread(#strings_index,(wsz),1,f)
 								if sz==1
+									setcall ret fseek(f,sections_offset,(SEEK_SET))
+									if ret!=-1
+										setcall ret collect_program3(f,number_of_sections,section_size,strings_index)
+									endif
 								endif
 							endif
 						endif
@@ -59,4 +63,32 @@ function collect_program2(sd f)
 		return ret
 	endif
 	return -1
+endfunction
+importx "malloc" malloc
+importx "free" free
+#same
+function collect_program3(sd f,sd size,sd section_size,sd strings)
+	mult size section_size
+	sd mem
+	setcall mem malloc(size)
+	if mem!=(NULL)
+		sd ret
+		sd sz
+		setcall sz fread(mem,size,1,f)
+		if sz==1
+			mult strings section_size
+			add strings mem
+			setcall ret get_strings(strings)
+		endif
+		call free(mem)
+		if sz!=1
+			return -1
+		endif
+		return ret
+	endif
+	return -1
+endfunction
+#same
+function get_strings(sd *strings)
+	return 0
 endfunction
