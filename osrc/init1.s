@@ -73,7 +73,7 @@ function add_elf_entry(sd fname,sv prip)
 		if ret!=-1
 			sd entry
 			importx "fread" fread
-			sd sz;setcall sz fread(#entry,:,1,f)
+			sd sz;setcall sz fread(#entry,(Elf64_Ehdr_e_entry_size),1,f)
 			if sz==1
 				add prip# entry
 			else

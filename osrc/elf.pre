@@ -1,10 +1,11 @@
 elf.h
 Elf64_Ehdr
-e_entry
-e_shoff
-e_shentsize
-e_shnum
-e_shstrndx
+e_entry,
+e_shoff,
+e_shentsize,
+e_shnum,
+e_shstrndx,
 Elf64_Shdr
+sh_name
 sh_offset
 sh_size

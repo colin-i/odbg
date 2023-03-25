@@ -29,22 +29,22 @@ function collect_program2(sd f)
 	if ret!=-1
 		sd sections_offset
 		sd sz
-		setcall sz fread(#sections_offset,:,1,f)
+		setcall sz fread(#sections_offset,(Elf64_Ehdr_e_shoff_size),1,f)
 		if sz==1
 			setcall ret fseek(f,(Elf64_Ehdr_e_shentsize),(SEEK_SET))
 			if ret!=-1
 				data section_size=0   #high part will always be 0, words?
-				setcall sz fread(#section_size,(wsz),1,f)
+				setcall sz fread(#section_size,(Elf64_Ehdr_e_shentsize_size),1,f)
 				if sz==1
 					setcall ret fseek(f,(Elf64_Ehdr_e_shnum),(SEEK_SET))
 					if ret!=-1
 						data number_of_sections=0
-						setcall sz fread(#number_of_sections,(wsz),1,f)
+						setcall sz fread(#number_of_sections,(Elf64_Ehdr_e_shnum_size),1,f)
 						if sz==1
 							setcall ret fseek(f,(Elf64_Ehdr_e_shstrndx),(SEEK_SET))
 							if ret!=-1
 								data strings_index=0
-								setcall sz fread(#strings_index,(wsz),1,f)
+								setcall sz fread(#strings_index,(Elf64_Ehdr_e_shstrndx_size),1,f)
 								if sz==1
 									setcall ret fseek(f,sections_offset,(SEEK_SET))
 									if ret!=-1
@@ -78,12 +78,15 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 		if sz==1
 			mult strings section_size
 			add strings mem
-			setcall ret get_section(f,#strings)
+			sd strings_end
+			setcall ret get_section(f,#strings,#strings_end)
 			if ret!=-1
 				ss dbg=".debug"
-				setcall ret get_named_section(f,strings,#dbg)
+				sd dbg_end
+				add size mem
+				setcall ret get_named_section(f,mem,section_size,size,strings,strings_end,#dbg,#dbg_end)
 				if ret!=-1
-					#call free(dbg)
+					call free(dbg)
 				endif
 				call free(strings)
 			endif
@@ -97,23 +100,26 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 	return -1
 endfunction
 #same
-function get_section(sd file,sv p_mem)
+function get_section(sd file,sv p_mem,sv p_end)
 	sd mem;set mem p_mem#
-	sv off=Elf64_Shdr_sh_offset
-	sv size=Elf64_Shdr_sh_size
 
+	sv off=Elf64_Shdr_sh_offset
 	add off mem
-	add size mem
 
 	sd ret
 	setcall ret fseek(file,off#,(SEEK_SET))
 	if ret!=-1
-		setcall mem malloc(size#)
+		sv size=Elf64_Shdr_sh_size
+		add size mem
+		set size size#
+		setcall mem malloc(size)
 		if mem!=(NULL)
 			sd sz
-			setcall sz fread(mem,size#,1,file)
+			setcall sz fread(mem,size,1,file)
 			if sz==1
 				set p_mem# mem
+				add mem size
+				set p_end# mem
 				return ret
 			endif
 			call free(mem)
@@ -123,6 +129,34 @@ function get_section(sd file,sv p_mem)
 	return -1
 endfunction
 #same
-function get_named_section(sd *file,sd *strings,sv *p_sec)
-	return 0
+function get_named_section(sd file,sd secs,sd esize,sd end,sd strings,sd strings_end,sv p_sec,sv p_end)
+	sd in;set in p_sec#
+	sd start;set start strings
+	while strings!=strings_end
+		sd c
+		importx "strcmp" strcmp
+		setcall c strcmp(strings,in)
+		if c==0
+			sub strings start
+			while secs!=end
+				sd p;set p secs
+				add p (Elf64_Shdr_sh_name)
+				#typedef uint32_t Elf64_Word
+
+				if p#==strings
+					set p_sec# secs
+					sd ret
+					setcall ret get_section(file,p_sec,p_end)
+					return ret
+				endif
+
+				add secs esize
+			endwhile
+			break
+		endif
+		importx "strlen" strlen
+		addcall strings strlen(strings)
+		inc strings
+	endwhile
+	return -1
 endfunction

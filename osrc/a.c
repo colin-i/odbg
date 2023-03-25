@@ -25,6 +25,7 @@ void main(int argc,char**argv){
 #include <%s>
 #include <stddef.h>
 #include <stdio.h>
+#define member_size(type, member) sizeof(((type *)0)->member)
 void main(){
 char*file="%s";
 FILE*f=fopen(file,"wb");
@@ -35,7 +36,13 @@ FILE*f=fopen(file,"wb");
 	for(int i=0;i<p2;i++)if(mem[i]=='\n'){
 		mem[i]='\0';
 		if('A'<=*s&&*s<='Z')ante=s;
-		else fprintf(f,"fprintf(f,\"const %s_%s=%%lu\\n\",offsetof(%s, %s));\n",ante,s,ante,s);
+		else{
+			int j=i-1;
+			int show_size=mem[j]==',';
+			if(show_size)mem[j]='\0';
+			fprintf(f,"fprintf(f,\"const %s_%s=%%lu\\n\",offsetof(%s, %s));\n",ante,s,ante,s);
+			if(show_size)fprintf(f,"fprintf(f,\"const %s_%s_size=%%lu\\n\",member_size(%s, %s));\n",ante,s,ante,s);
+		}
 		s=&mem[i+1];
 	}
 	free(mem);
