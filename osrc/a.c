@@ -7,9 +7,8 @@
 void main(int argc,char**argv){
 	char*n=argv[1];
 	FILE*pre=fopen(n,"rb");
-	char*b1;char*b2;size_t s1,s2;
-	s1=getline(&b1,&s1,pre);b1[s1-1]='\0';
-	s2=getline(&b2,&s2,pre);b2[s2-1]='\0';
+	char*bf;size_t sz;
+	sz=getline(&bf,&sz,pre);bf[sz-1]='\0';
 	long p=ftell(pre);
 	fseek(pre,0,SEEK_END);
 	long p2=ftell(pre);
@@ -28,18 +27,17 @@ void main(int argc,char**argv){
 #include <stdio.h>
 void main(){
 char*file="%s";
-char*ante="%s";
 FILE*f=fopen(file,"wb");
-)",b1,argv[2],b2);
-	free(b1);
+)",bf,argv[2]);
+	free(bf);
 
-	char*s=mem;
+	char*s=mem;char*ante;
 	for(int i=0;i<p2;i++)if(mem[i]=='\n'){
 		mem[i]='\0';
-		fprintf(f,"fprintf(f,\"const %%s_%%s=%%lu\\n\",ante,\"%s\",offsetof(%s, %s));\n",s,b2,s);
+		if('A'<=*s&&*s<='Z')ante=s;
+		else fprintf(f,"fprintf(f,\"const %s_%s=%%lu\\n\",offsetof(%s, %s));\n",ante,s,ante,s);
 		s=&mem[i+1];
 	}
-	free(b2);
 	free(mem);
 
 	fprintf(f,R"(fclose(f);

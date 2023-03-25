@@ -78,7 +78,10 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 		if sz==1
 			mult strings section_size
 			add strings mem
-			setcall ret get_strings(strings)
+			setcall strings get_section(strings,f)
+			if strings!=(NULL)
+				call free(strings)
+			endif
 		endif
 		call free(mem)
 		if sz!=1
@@ -88,7 +91,27 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 	endif
 	return -1
 endfunction
-#same
-function get_strings(sd *strings)
-	return 0
+#alloc
+function get_section(sv mem,sd file)
+	sv off=Elf64_Shdr_sh_offset
+	sv size=Elf64_Shdr_sh_size
+
+	add off mem
+	add size mem
+
+	sd ret
+	setcall ret fseek(file,off#,(SEEK_SET))
+	if ret!=-1
+		setcall mem malloc(size#)
+		if mem!=(NULL)
+			sd sz
+			setcall sz fread(mem,size#,1,file)
+			if sz==1
+				return mem
+			endif
+			call free(mem)
+		endif
+	endif
+
+	return (NULL)
 endfunction
