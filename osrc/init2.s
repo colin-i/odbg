@@ -78,8 +78,13 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 		if sz==1
 			mult strings section_size
 			add strings mem
-			setcall strings get_section(strings,f)
-			if strings!=(NULL)
+			setcall ret get_section(f,#strings)
+			if ret!=-1
+				ss dbg=".debug"
+				setcall ret get_named_section(f,strings,#dbg)
+				if ret!=-1
+					#call free(dbg)
+				endif
 				call free(strings)
 			endif
 		endif
@@ -91,8 +96,9 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 	endif
 	return -1
 endfunction
-#alloc
-function get_section(sv mem,sd file)
+#same
+function get_section(sd file,sv p_mem)
+	sd mem;set mem p_mem#
 	sv off=Elf64_Shdr_sh_offset
 	sv size=Elf64_Shdr_sh_size
 
@@ -107,11 +113,16 @@ function get_section(sv mem,sd file)
 			sd sz
 			setcall sz fread(mem,size#,1,file)
 			if sz==1
-				return mem
+				set p_mem# mem
+				return ret
 			endif
 			call free(mem)
 		endif
 	endif
 
-	return (NULL)
+	return -1
+endfunction
+#same
+function get_named_section(sd *file,sd *strings,sv *p_sec)
+	return 0
 endfunction
