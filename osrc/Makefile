@@ -22,7 +22,7 @@ all: ${name}
 precompile = elf
 
 items = init
-aritems = init1 init2
+aritems = init1 init2 init3
 
 $(foreach var,$(precompile),$(eval pre += ${var}.h))
 $(foreach var,$(aritems),$(eval aobs += ${var}.o))
