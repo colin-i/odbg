@@ -87,7 +87,7 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 				setcall ret get_named_section(f,mem,section_size,size,strings,strings_end,#dbg,#dbg_end)
 				if ret!=-1
 					import "memorize_program" memorize_program
-					setcall ret memorize_program(dbg)
+					setcall ret memorize_program(dbg,dbg_end)
 					call free(dbg)
 				endif
 				call free(strings)
