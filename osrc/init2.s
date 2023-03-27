@@ -6,9 +6,70 @@ include "elf.h"
 include "../include/common.h"
 include "common.h"
 
+#er=-1
+function get_section(sd file,sv p_mem,sv p_end)
+	sd mem;set mem p_mem#
+
+	sv off=Elf64_Shdr_sh_offset
+	add off mem
+
+	sd ret
+	setcall ret fseek(file,off#,(SEEK_SET))
+	if ret!=-1
+		sv size=Elf64_Shdr_sh_size
+		add size mem
+		set size size#
+		setcall mem malloc(size)
+		if mem!=(NULL)
+			sd sz
+			setcall sz fread(mem,size,1,file)
+			if sz==1
+				set p_mem# mem
+				add mem size
+				set p_end# mem
+				return ret
+			endif
+			call free(mem)
+		endif
+	endif
+
+	return -1
+endfunction
+#same
+function get_named_section(sd file,sd secs,sd esize,sd end,sd strings,sd strings_end,sv p_sec,sv p_end)
+	sd in;set in p_sec#
+	sd start;set start strings
+	while strings!=strings_end
+		sd c
+		importx "strcmp" strcmp
+		setcall c strcmp(strings,in)
+		if c==0
+			sub strings start
+			while secs!=end
+				sd p;set p secs
+				add p (Elf64_Shdr_sh_name)
+				#typedef uint32_t Elf64_Word
+
+				if p#==strings
+					set p_sec# secs
+					sd ret
+					setcall ret get_section(file,p_sec,p_end)
+					return ret
+				endif
+
+				add secs esize
+			endwhile
+			break
+		endif
+		importx "strlen" strlen
+		addcall strings strlen(strings)
+		inc strings
+	endwhile
+	return -1
+endfunction
 importx "fopen" fopen
 importx "fclose" fclose
-#er=-1
+#same
 function collect_program(ss program)
 	sd f;setcall f fopen(program,"rb")
 	if f!=(NULL)
@@ -99,66 +160,5 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 		endif
 		return ret
 	endif
-	return -1
-endfunction
-#same
-function get_section(sd file,sv p_mem,sv p_end)
-	sd mem;set mem p_mem#
-
-	sv off=Elf64_Shdr_sh_offset
-	add off mem
-
-	sd ret
-	setcall ret fseek(file,off#,(SEEK_SET))
-	if ret!=-1
-		sv size=Elf64_Shdr_sh_size
-		add size mem
-		set size size#
-		setcall mem malloc(size)
-		if mem!=(NULL)
-			sd sz
-			setcall sz fread(mem,size,1,file)
-			if sz==1
-				set p_mem# mem
-				add mem size
-				set p_end# mem
-				return ret
-			endif
-			call free(mem)
-		endif
-	endif
-
-	return -1
-endfunction
-#same
-function get_named_section(sd file,sd secs,sd esize,sd end,sd strings,sd strings_end,sv p_sec,sv p_end)
-	sd in;set in p_sec#
-	sd start;set start strings
-	while strings!=strings_end
-		sd c
-		importx "strcmp" strcmp
-		setcall c strcmp(strings,in)
-		if c==0
-			sub strings start
-			while secs!=end
-				sd p;set p secs
-				add p (Elf64_Shdr_sh_name)
-				#typedef uint32_t Elf64_Word
-
-				if p#==strings
-					set p_sec# secs
-					sd ret
-					setcall ret get_section(file,p_sec,p_end)
-					return ret
-				endif
-
-				add secs esize
-			endwhile
-			break
-		endif
-		importx "strlen" strlen
-		addcall strings strlen(strings)
-		inc strings
-	endwhile
 	return -1
 endfunction

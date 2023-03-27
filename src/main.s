@@ -22,6 +22,7 @@ importx "activateCDKSwindow" activateCDKSwindow
 importx "printf" printf
 
 importx "odbg_init" odbg_init
+importx "odbg_free" odbg_free
 
 entry main(sd argc,sv argv)
 	if argc<2
@@ -40,6 +41,8 @@ entry main(sd argc,sv argv)
 			call destroyCDKObject(CDKSwindow)
 			call destroyCDKScreen(cdkscreen)
 			call endCDK()
+
+			call odbg_free() #this will not stay here
 		endif
 	endelse
 	return 0

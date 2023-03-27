@@ -52,3 +52,12 @@ functionx odbg_init(sv argv)
 
 	return ret
 endfunction
+
+functionx odbg_free()
+	import "files" files
+	sv p;setcall p files()
+	#if p#!=(NULL) #this will be uncommented
+		importx "free" free
+		call free(p#)
+	#endif
+endfunction

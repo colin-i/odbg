@@ -3,9 +3,12 @@ format elfobj64
 
 include "../include/common.h"
 
-warning off
-include  "/usr/include/ocompiler/log.h"
-warning on
+einclude  "/usr/include/ocompiler/log.h"
+
+function files()
+	value pointer=0
+	return #pointer
+endfunction
 
 #-1 err
 function memorize_program(ss mem,sd end)
@@ -24,10 +27,18 @@ function memorize_program(ss mem,sd end)
 			return -1
 		endif
 		if mem#==(log_pathname)
-			inc number_of_files
+			add number_of_files :
 		endif
 		add pointer t_size
 		set mem pointer
 	endwhile
-	return 0
+
+	importx "malloc" malloc
+	sv p;setcall p files()
+	setcall p# malloc(number_of_files)
+	if p#!=(NULL)
+		return 0
+	endif
+
+	return -1
 endfunction
