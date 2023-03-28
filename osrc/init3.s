@@ -42,11 +42,7 @@ function memorize_program(ss mem,sd end)
 	if p#!=(NULL)
 		while cursor!=end
 			setcall pointer strstr(cursor,#term)
-			if pointer==(NULL)
-				importx "free" free
-				call free(p#)
-				return -1
-			endif
+			#if pointer==(NULL) was checked already
 			#log_pathfolder
 			#log_pathname
 			#log_fileend
