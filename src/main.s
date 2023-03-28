@@ -42,7 +42,7 @@ entry main(sd argc,sv argv)
 			call destroyCDKScreen(cdkscreen)
 			call endCDK()
 
-			call odbg_free() #this will not stay here
+			call odbg_free()
 		endif
 	endelse
 	return 0

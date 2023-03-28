@@ -19,6 +19,9 @@ function memorize_program(ss mem,sd end)
 	sd t_size
 	setcall t_size strlen(#term)
 
+	#store for main iteration
+	ss cursor;set cursor mem
+
 	while mem!=end
 		importx "strstr" strstr
 		sd pointer
@@ -37,6 +40,21 @@ function memorize_program(ss mem,sd end)
 	sv p;setcall p files()
 	setcall p# malloc(number_of_files)
 	if p#!=(NULL)
+		while cursor!=end
+			setcall pointer strstr(cursor,#term)
+			if pointer==(NULL)
+				importx "free" free
+				call free(p#)
+				return -1
+			endif
+			#log_pathfolder
+			#log_pathname
+			#log_fileend
+			#log_fileend_old
+			#log_line
+			add pointer t_size
+			set cursor pointer
+		endwhile
 		return 0
 	endif
 
