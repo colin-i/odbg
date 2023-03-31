@@ -11,11 +11,9 @@ function files()
 	return #pointer
 endfunction
 
-importx "free" free
-
 #-1 err
 function memorize_program(ss mem,sd end)
-	sd number_of_files=0
+	sd number_of_files=:  #one for null
 
 	char term="\r\n"
 	importx "strlen" strlen
@@ -39,17 +37,19 @@ function memorize_program(ss mem,sd end)
 		set mem pointer
 	endwhile
 
-	importx "malloc" malloc
+	importx "calloc" calloc  #will have mallocs
 	sv p;setcall p files()
-	setcall p# malloc(number_of_files)
+	setcall p# calloc(1,number_of_files)
+	sd storer;set storer p#
 	if p#!=(NULL)
 		while cursor!=end
 			setcall pointer strstr(cursor,#term)
 			#if pointer==(NULL) was checked already
 			set pointer# (asciinul)
-			sd ret;setcall ret memorize_line(cursor)
+			sd ret;setcall ret memorize_line(cursor,#storer)
 			if ret==-1
-				call free(p#)
+				import "odbg_free" odbg_free
+				call odbg_free()
 				return -1
 			endif
 			add pointer t_size
@@ -61,14 +61,16 @@ function memorize_program(ss mem,sd end)
 	return -1
 endfunction
 #same
-function memorize_line(ss cursor)
+function memorize_line(ss cursor,sv storer)
 	#log_line
 	if cursor#==(log_pathname)
 		inc cursor
 		importx "realpath" realpath
 		sd n;setcall n realpath(cursor,(NULL))
 		if n!=(NULL)
-			call free(n)
+			sv aux;set aux storer#
+			set aux# n
+			incst storer#
 		else
 			return -1
 		endelse

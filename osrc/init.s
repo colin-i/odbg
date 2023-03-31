@@ -1,6 +1,8 @@
 
 format elfobj64
 
+include "../include/common.h"
+
 const PTRACE_TRACEME=0
 
 #-1 or different
@@ -56,6 +58,12 @@ endfunction
 functionx odbg_free()
 	import "files" files
 	sv p;setcall p files()
+	set p p#
+	sv cursor;set cursor p
 	importx "free" free
-	call free(p#)
+	while cursor#!=(NULL)
+		call free(cursor#)
+		incst cursor
+	endwhile
+	call free(p)
 endfunction
