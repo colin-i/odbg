@@ -7,8 +7,8 @@ ifndef OLINK
 OLINK=ounused
 endif
 
-ifndef syms
-syms=-O1 -s
+ifndef linkerflags
+linkerflags=-O1 -s
 endif
 
 name=libodbg.so
@@ -33,7 +33,7 @@ $(foreach var,$(items),$(eval logs += ${var}.s.log))
 ${name}: ${exte} ${obs}
 	${OLINK} ${alogs} ${logs}
 	@echo
-	$(CC) ${syms} ${obs} -shared -o ${name} -L. -l:${exte} -Wl,--exclude-libs ${exte}
+	$(CC) ${linkerflags} ${obs} -shared -o ${name} -L. -l:${exte} -Wl,--exclude-libs ${exte}
 
 ${exte}: ${prebin} ${pre} ${aobs}
 	$(AR) cr ${exte} ${aobs}

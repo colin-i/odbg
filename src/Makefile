@@ -7,8 +7,8 @@ ifndef OLINK
 OLINK=ounused
 endif
 
-ifndef syms
-syms=-O1 -s
+ifndef linkerflags
+linkerflags=-O1 -s
 endif
 
 all: odbg
@@ -21,7 +21,7 @@ $(foreach var,$(items),$(eval logs += ${var}.s.log))
 odbg: ${obs}
 	${OLINK} ${logs}
 	@echo
-	$(CC) ${syms} ${obs} -o odbg -lcdk -L../osrc -lodbg
+	$(CC) ${linkerflags} ${obs} -o odbg -lcdk -L../osrc -lodbg
 
 %.o: %.s
 	${OCOMP} $< ${OFLAGS}
