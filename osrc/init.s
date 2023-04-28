@@ -3,6 +3,8 @@ format elfobj64
 
 include "../include/common.h"
 
+include "header.h"
+
 const PTRACE_TRACEME=0
 
 #-1 or different
@@ -63,7 +65,7 @@ functionx odbg_free()
 	importx "free" free
 	while cursor#!=(NULL)
 		call free(cursor#)
-		incst cursor
+		add cursor (!!file)
 	endwhile
 	call free(p)
 endfunction

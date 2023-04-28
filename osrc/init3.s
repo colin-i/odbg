@@ -4,6 +4,8 @@ format elfobj64
 include "../include/common.h"
 include "common.h"
 
+include "header.h"
+
 einclude  "/usr/include/ocompiler/log.h"
 
 function files()
@@ -13,7 +15,7 @@ endfunction
 
 #-1 err
 function memorize_program(ss mem,sd end)
-	sd number_of_files=:  #one for null
+	sd number_of_files=1  #one for null
 
 	char term="\r\n"
 	importx "strlen" strlen
@@ -31,7 +33,7 @@ function memorize_program(ss mem,sd end)
 			return -1
 		endif
 		if mem#==(log_pathname)
-			add number_of_files :
+			inc number_of_files
 		endif
 		add pointer t_size
 		set mem pointer
@@ -39,6 +41,7 @@ function memorize_program(ss mem,sd end)
 
 	importx "calloc" calloc  #will have mallocs
 	sv p;setcall p files()
+	mult number_of_files (!!file)
 	setcall p# calloc(1,number_of_files)
 	sd storer;set storer p#
 	if p#!=(NULL)
@@ -70,7 +73,7 @@ function memorize_line(ss cursor,sv storer)
 		if n!=(NULL)
 			sv aux;set aux storer#
 			set aux# n
-			incst storer#
+			add storer# (!!file)
 		else
 			return -1
 		endelse
