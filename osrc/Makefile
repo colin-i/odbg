@@ -8,7 +8,8 @@ OLINK=ounused
 endif
 
 ifndef linkerflags
-linkerflags=-O1 -s
+linkerflags=-s
+#-O (same as actionswf)
 endif
 
 name=libodbg.so
