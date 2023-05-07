@@ -1,2 +1,4 @@
 
 LD_LIBRARY_PATH=../osrc ./odbg ${1}
+
+# /home/bc/g/arh/a.out

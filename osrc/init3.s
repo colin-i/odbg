@@ -72,7 +72,12 @@ function memorize_line(ss cursor,sv storer)
 		sd n;setcall n realpath(cursor,(NULL))
 		if n!=(NULL)
 			sv aux;set aux storer#
-			set aux# n
+			set aux#:file.path n
+
+			importx "malloc" malloc
+			#and set for lines
+			setcall aux#:file.lines malloc((NULL))
+
 			add storer# (!!file)
 		else
 			return -1

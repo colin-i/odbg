@@ -64,7 +64,8 @@ functionx odbg_free()
 	sv cursor;set cursor p
 	importx "free" free
 	while cursor#!=(NULL)
-		call free(cursor#)
+		call free(cursor#:file.path)
+		call free(cursor#:file.lines)
 		add cursor (!!file)
 	endwhile
 	call free(p)
