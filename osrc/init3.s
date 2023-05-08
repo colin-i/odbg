@@ -5,8 +5,12 @@ include "../include/common.h"
 include "common.h"
 
 include "header.h"
+function line()
+	datax nr#1
+	datax reg#1
+endfunction
 
-einclude  "/usr/include/ocompiler/log.h"
+einclude  "/usr/include/ocompiler/logs.h"
 
 function files()
 	value pointer=0
@@ -43,7 +47,7 @@ function memorize_program(ss mem,sd end)
 	sv p;setcall p files()
 	mult number_of_files (!!file)
 	setcall p# calloc(1,number_of_files)
-	sd storer;set storer p#
+	sd storer;set storer p#;decst storer
 	if p#!=(NULL)
 		while cursor!=end
 			setcall pointer strstr(cursor,#term)
@@ -65,20 +69,46 @@ function memorize_program(ss mem,sd end)
 endfunction
 #same
 function memorize_line(ss cursor,sv storer)
-	#log_line
-	if cursor#==(log_pathname)
+	sv fl
+	if cursor#==(log_line)
+		set fl storer#
+		inc fl#:file.lnumber
+		importx "reallocarray" reallocarray
+		sd mem;setcall mem reallocarray(fl#:file.lines,fl#:file.lnumber,(!!line))
+		if mem==(NULL)
+			return -1
+		endif
+		set fl#:file.lines mem
+
+		inc cursor
+		importx "sscanf" sscanf
+		sd items
+		setcall items sscanf(cursor,"%u %u",#mem#:line.nr,#mem#:line.reg)
+		if items!=2
+			return -1
+		endif
+	elseif cursor#==(log_pathname)
 		inc cursor
 		importx "realpath" realpath
 		sd n;setcall n realpath(cursor,(NULL))
 		if n!=(NULL)
-			sv aux;set aux storer#
-			set aux#:file.path n
+			sd lns;setcall lns malloc((NULL))
+			if lns!=(NULL)
+				add storer# (!!file)
 
-			importx "malloc" malloc
-			#and set for lines
-			setcall aux#:file.lines malloc((NULL))
+				set fl storer#
+				set fl#:file.path n
 
-			add storer# (!!file)
+				importx "malloc" malloc
+				#and set for lines
+				set fl#:file.lines lns
+
+				set fl#:file.lnumber 0
+			else
+				importx "free" free
+				call free(n)
+				return -1
+			endelse
 		else
 			return -1
 		endelse
