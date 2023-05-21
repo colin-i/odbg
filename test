@@ -2,5 +2,5 @@
 while [ -z "`tmux list-clients -t ${1}`" ]; do
 	sleep 0.1
 done
-tmux resize-pane -x 25% -t ${1}:window.0
+tmux split-window -dh -l 75% -t ${1}:window.0 edor
 sleep 2
