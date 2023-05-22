@@ -1,0 +1,9 @@
+
+if [ "${#@}" != "1" ]; then echo "Usage: odbg program"; exit 1; fi
+
+tmux -f t.conf new-session -s odbg -n 'window' -d ./prog && \
+name=odbg`tmux list-sessions -f"#{==:#{session_name},odbg}" -F "#{session_id}"` && \
+tmux rename-session -t odbg ${name} && \
+tmux split-window -d -t ${name}:window.0 ./prog ${name} ${1} && \
+tmux kill-pane -t ${name}:window.0 && \
+tmux attach -t ${name}

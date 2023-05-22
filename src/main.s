@@ -19,17 +19,11 @@ importx "newCDKSwindow" newCDKSwindow
 importx "_destroyCDKObject" destroyCDKObject
 importx "activateCDKSwindow" activateCDKSwindow
 
-importx "printf" printf
-
 importx "odbg_init" odbg_init
 importx "odbg_free" odbg_free
 
 entry main(sd argc,sv argv)
-	if argc<2
-		call printf("Usage: odbg program")
-		char n={10,0}
-		call printf(#n)
-	else
+	if argc==2
 		incst argv
 		sd r;setcall r odbg_init(argv)
 		if r!=-1
@@ -44,5 +38,5 @@ entry main(sd argc,sv argv)
 
 			call odbg_free()
 		endif
-	endelse
+	endif
 	return 0

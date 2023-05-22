@@ -44,11 +44,12 @@ function memorize_program(ss mem,sd end)
 	endwhile
 
 	importx "calloc" calloc  #will have mallocs
-	sv p;setcall p files()
+	sv storer;setcall storer files()
 	mult number_of_files (!!file)
-	setcall p# calloc(1,number_of_files)
-	sd storer;set storer p#;decst storer
-	if p#!=(NULL)
+	setcall storer# calloc(1,number_of_files)  #here will be tested at frees
+	set storer storer#
+	if storer!=(NULL)
+		sub storer (!!file)  #will add another one at path start
 		while cursor!=end
 			setcall pointer strstr(cursor,#term)
 			#if pointer==(NULL) was checked already
@@ -69,18 +70,23 @@ function memorize_program(ss mem,sd end)
 endfunction
 #same
 function memorize_line(ss cursor,sv storer)
-	sv fl
+	valuex samecombiner#1
 	if cursor#==(log_line)
-		set fl storer#
-		inc fl#:file.lnumber
+		set samecombiner storer#
+
+		sd pos=!!line
+		mult pos samecombiner#:file.lnumber
+		inc samecombiner#:file.lnumber
+
 		importx "reallocarray" reallocarray
-		sd mem;setcall mem reallocarray(fl#:file.lines,fl#:file.lnumber,(!!line))
+		sd mem;setcall mem reallocarray(samecombiner#:file.lines,samecombiner#:file.lnumber,(!!line))
 		if mem==(NULL)
 			return -1
 		endif
-		set fl#:file.lines mem
+		set samecombiner#:file.lines mem
 
 		inc cursor
+		add mem pos
 		importx "sscanf" sscanf
 		sd items
 		setcall items sscanf(cursor,"%u %u",#mem#:line.nr,#mem#:line.reg)
@@ -92,18 +98,18 @@ function memorize_line(ss cursor,sv storer)
 		importx "realpath" realpath
 		sd n;setcall n realpath(cursor,(NULL))
 		if n!=(NULL)
+			importx "malloc" malloc
 			sd lns;setcall lns malloc((NULL))
 			if lns!=(NULL)
 				add storer# (!!file)
+				set samecombiner storer#
 
-				set fl storer#
-				set fl#:file.path n
+				set samecombiner#:file.path n
 
-				importx "malloc" malloc
 				#and set for lines
-				set fl#:file.lines lns
+				set samecombiner#:file.lines lns
 
-				set fl#:file.lnumber 0
+				set samecombiner#:file.lnumber 0
 			else
 				importx "free" free
 				call free(n)
