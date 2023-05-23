@@ -2,5 +2,8 @@
 while [ -z "`tmux list-clients -t ${1}`" ]; do
 	sleep 0.1
 done
-tmux split-window -dh -l 75% -t ${1}:window.0 edor
+
+tmux split-window -dv -l 25% -t ${1}:window.0 ../bsrc/odbgbot
+tmux split-window -dh -t ${1}:window.0 edor
+tmux resize-pane -x 16 -t ${1}:window.0
 LD_LIBRARY_PATH=../osrc ./odbg ${2}
