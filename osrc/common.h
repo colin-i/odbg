@@ -1,4 +1,6 @@
 
+const NULL=0
+
 const SEEK_SET=0
 
 const dwordstr=10

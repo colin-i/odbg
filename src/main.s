@@ -1,23 +1,14 @@
 
 #!
 o language debugger
-cdk cui
+cui
 !
 
 format elfobj64
 
-include "../include/common.h"
-
-const TRUE=1
-const FALSE=0
-
-importx "initCDKScreen" initCDKScreen
-importx "destroyCDKScreen" destroyCDKScreen
-importx "endCDK" endCDK
-
-importx "newCDKSwindow" newCDKSwindow
-importx "_destroyCDKObject" destroyCDKObject
-importx "activateCDKSwindow" activateCDKSwindow
+importx "opy_initialize" opy_initialize
+importx "opy_finalize" opy_finalize
+importx "opy_import" opy_import
 
 importx "odbg_init" odbg_init
 importx "odbg_free" odbg_free
@@ -27,14 +18,13 @@ entry main(sd argc,sv argv)
 		incst argv
 		sd r;setcall r odbg_init(argv)
 		if r!=-1
-			sd cdkscreen;setcall cdkscreen initCDKScreen((NULL))
-			sd CDKSwindow;setcall CDKSwindow newCDKSwindow(cdkscreen,0,0,0,0,"O Debugger",0,(TRUE),(FALSE))
-			if CDKSwindow!=(NULL)
-				call activateCDKSwindow(CDKSwindow,(NULL))
+			sd err;setcall err opy_initialize()
+			if err==0
+				setcall err opy_import("urwid")
+				if err==0
+				endif
+				call opy_finalize()
 			endif
-			call destroyCDKObject(CDKSwindow)
-			call destroyCDKScreen(cdkscreen)
-			call endCDK()
 
 			call odbg_free()
 		endif

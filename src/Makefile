@@ -21,7 +21,7 @@ $(foreach var,$(items),$(eval logs += ${var}.s.log))
 odbg: ${obs}
 	${OLINK} ${logs}
 	@echo
-	$(CC) ${linkerflags} ${obs} -o odbg -lcdk -L../osrc -lodbg
+	$(CC) ${linkerflags} ${obs} -o odbg -lopython -L../osrc -lodbg
 
 %.o: %.s
 	${OCOMP} $< ${OFLAGS}

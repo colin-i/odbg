@@ -1,7 +1,6 @@
 
 format elfobj64
 
-include "../include/common.h"
 include "common.h"
 
 include "header.h"

@@ -3,7 +3,6 @@ format elfobj64
 
 include "elf.h"
 
-include "../include/common.h"
 include "common.h"
 
 #er=-1

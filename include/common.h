@@ -1,2 +1,0 @@
-
-const NULL=0
