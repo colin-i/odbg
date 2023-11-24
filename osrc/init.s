@@ -17,7 +17,7 @@ functionx odbg_init(sv argv)
 	setcall ret vfork()
 
 	if ret!=-1
-		if ret==0
+		if ret=0
 			importx "ptrace" ptrace
 
 			setcall ret ptrace((PTRACE_TRACEME),0,0,0)

@@ -22,7 +22,7 @@ function get_section(sd file,sv p_mem,sv p_end)
 		if mem!=(NULL)
 			sd sz
 			setcall sz fread(mem,size,1,file)
-			if sz==1
+			if sz=1
 				set p_mem# mem
 				add mem size
 				set p_end# mem
@@ -42,14 +42,14 @@ function get_named_section(sd file,sd secs,sd esize,sd end,sd strings,sd strings
 		sd c
 		importx "strcmp" strcmp
 		setcall c strcmp(strings,in)
-		if c==0
+		if c=0
 			sub strings start
 			while secs!=end
 				sd p;set p secs
 				add p (Elf64_Shdr_sh_name)
 				#typedef uint32_t Elf64_Word
 
-				if p#==strings
+				if p#=strings
 					set p_sec# secs
 					sd ret
 					setcall ret get_section(file,p_sec,p_end)
@@ -90,22 +90,22 @@ function collect_program2(sd f)
 		sd sections_offset
 		sd sz
 		setcall sz fread(#sections_offset,(Elf64_Ehdr_e_shoff_size),1,f)
-		if sz==1
+		if sz=1
 			setcall ret fseek(f,(Elf64_Ehdr_e_shentsize),(SEEK_SET))
 			if ret!=-1
 				data section_size=0   #high part will always be 0, words?
 				setcall sz fread(#section_size,(Elf64_Ehdr_e_shentsize_size),1,f)
-				if sz==1
+				if sz=1
 					setcall ret fseek(f,(Elf64_Ehdr_e_shnum),(SEEK_SET))
 					if ret!=-1
 						data number_of_sections=0
 						setcall sz fread(#number_of_sections,(Elf64_Ehdr_e_shnum_size),1,f)
-						if sz==1
+						if sz=1
 							setcall ret fseek(f,(Elf64_Ehdr_e_shstrndx),(SEEK_SET))
 							if ret!=-1
 								data strings_index=0
 								setcall sz fread(#strings_index,(Elf64_Ehdr_e_shstrndx_size),1,f)
-								if sz==1
+								if sz=1
 									setcall ret fseek(f,sections_offset,(SEEK_SET))
 									if ret!=-1
 										setcall ret collect_program3(f,number_of_sections,section_size,strings_index)
@@ -135,7 +135,7 @@ function collect_program3(sd f,sd size,sd section_size,sd strings)
 		sd ret
 		sd sz
 		setcall sz fread(mem,size,1,f)
-		if sz==1
+		if sz=1
 			mult strings section_size
 			add strings mem
 			sd strings_end

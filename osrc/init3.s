@@ -32,10 +32,10 @@ function memorize_program(ss mem,sd end)
 	while mem!=end
 		importx "strstr" strstr
 		setcall pointer strstr(mem,#term)
-		if pointer==(NULL)
+		if pointer=(NULL)
 			return -1
 		endif
-		if mem#==(log_pathname)
+		if mem#=(log_pathname)
 			inc number_of_files
 		endif
 		add pointer t_size
@@ -54,7 +54,7 @@ function memorize_program(ss mem,sd end)
 			#if pointer==(NULL) was checked already
 			set pointer# (asciinul)
 			sd ret;setcall ret memorize_line(cursor,#storer)
-			if ret==-1
+			if ret=-1
 				import "odbg_free" odbg_free
 				call odbg_free()
 				return -1
@@ -70,7 +70,7 @@ endfunction
 #same
 function memorize_line(ss cursor,sv storer)
 	valuex samecombiner#1
-	if cursor#==(log_line)
+	if cursor#=(log_line)
 		set samecombiner storer#
 
 		sd pos=!!line
@@ -79,7 +79,7 @@ function memorize_line(ss cursor,sv storer)
 
 		importx "reallocarray" reallocarray
 		sd mem;setcall mem reallocarray(samecombiner#:file.lines,samecombiner#:file.lnumber,(!!line))
-		if mem==(NULL)
+		if mem=(NULL)
 			return -1
 		endif
 		set samecombiner#:file.lines mem
@@ -92,7 +92,7 @@ function memorize_line(ss cursor,sv storer)
 		if items!=2
 			return -1
 		endif
-	elseif cursor#==(log_pathname)
+	elseif cursor#=(log_pathname)
 		inc cursor
 		importx "realpath" realpath
 		sd n;setcall n realpath(cursor,(NULL))
@@ -119,7 +119,7 @@ function memorize_line(ss cursor,sv storer)
 		endelse
 	#log_fileend
 	#log_fileend_old
-	elseif cursor#==(log_pathfolder)
+	elseif cursor#=(log_pathfolder)
 		inc cursor
 		importx "chdir" chdir
 		sd ret

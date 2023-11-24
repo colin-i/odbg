@@ -73,7 +73,7 @@ function add_elf_entry(sd fname,sv prip)
 			sd entry
 			importx "fread" fread
 			sd sz;setcall sz fread(#entry,(Elf64_Ehdr_e_entry_size),1,f)
-			if sz==1
+			if sz=1
 				add prip# entry
 			else
 				set ret -1
@@ -93,7 +93,7 @@ function break_at_entry(sd proc,sd rip)
 	set err# 0
 	sd back
 	setcall back ptrace((PTRACE_PEEKTEXT),proc,rip,0)
-	if err#==0
+	if err#=0
 		sd ret
 		#call memset(b,0x90,(:-1))
 

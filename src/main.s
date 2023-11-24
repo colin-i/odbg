@@ -14,14 +14,14 @@ importx "odbg_init" odbg_init
 importx "odbg_free" odbg_free
 
 entry main(sd argc,sv argv)
-	if argc==2
+	if argc=2
 		incst argv
 		sd r;setcall r odbg_init(argv)
 		if r!=-1
 			sd err;setcall err opy_initialize()
-			if err==0
+			if err=0
 				setcall err opy_import("urwid")
-				if err==0
+				if err=0
 				endif
 				call opy_finalize()
 			endif
