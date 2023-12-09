@@ -66,7 +66,7 @@ functionx odbg_free()
 	while cursor#!=(NULL)
 		call free(cursor#:file.path)
 		call free(cursor#:file.lines)
-		add cursor (!!file)
+		add cursor (\\file)
 	endwhile
 	call free(p)
 endfunction

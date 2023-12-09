@@ -44,11 +44,11 @@ function memorize_program(ss mem,sd end)
 
 	importx "calloc" calloc  #will have mallocs
 	sv storer;setcall storer files()
-	mult number_of_files (!!file)
+	mult number_of_files (\\file)
 	setcall storer# calloc(1,number_of_files)  #here will be tested at frees
 	set storer storer#
 	if storer!=(NULL)
-		sub storer (!!file)  #will add another one at path start
+		sub storer (\\file)  #will add another one at path start
 		while cursor!=end
 			setcall pointer strstr(cursor,#term)
 			#if pointer==(NULL) was checked already
@@ -73,12 +73,12 @@ function memorize_line(ss cursor,sv storer)
 	if cursor#=(log_line)
 		set samecombiner storer#
 
-		sd pos=!!line
+		sd pos=\\line
 		mult pos samecombiner#:file.lnumber
 		inc samecombiner#:file.lnumber
 
 		importx "reallocarray" reallocarray
-		sd mem;setcall mem reallocarray(samecombiner#:file.lines,samecombiner#:file.lnumber,(!!line))
+		sd mem;setcall mem reallocarray(samecombiner#:file.lines,samecombiner#:file.lnumber,(\\line))
 		if mem=(NULL)
 			return -1
 		endif
@@ -100,7 +100,7 @@ function memorize_line(ss cursor,sv storer)
 			importx "malloc" malloc
 			sd lns;setcall lns malloc((NULL))
 			if lns!=(NULL)
-				add storer# (!!file)
+				add storer# (\\file)
 				set samecombiner storer#
 
 				set samecombiner#:file.path n

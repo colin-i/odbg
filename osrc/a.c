@@ -7,8 +7,9 @@
 void main(int argc,char**argv){
 	char*n=argv[1];
 	FILE*pre=fopen(n,"rb");
-	char*bf;size_t sz;
-	sz=getline(&bf,&sz,pre);bf[sz-1]='\0';
+	char*bf=NULL;size_t sz;
+	sz=getline(&bf,&sz,pre);
+	bf[sz-1]='\0';
 	long p=ftell(pre);
 	fseek(pre,0,SEEK_END);
 	long p2=ftell(pre);
