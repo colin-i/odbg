@@ -39,7 +39,10 @@ function trap_at_entry(sd proc,sd fname)
 		sd size
 
 		importx "getdelim" getdelim
-		#This  buffer  should  be freed by the user program even if getline() failed. more at "otoc"
+		#This buffer should be freed by the user program even if getline() failed
+		#On error, malloc returns NULL
+		#free, If ptr is NULL, no operation is performed
+
 		sd ret;setcall ret getdelim(#line,#size,(asciiminus),file)
 		if ret!=-1
 			importx "sscanf" sscanf
