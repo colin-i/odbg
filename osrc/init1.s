@@ -37,9 +37,9 @@ function trap_at_entry(sd proc,sd fname)
 	if file!=(NULL)
 		sd line=NULL
 		sd size
-		#This  buffer  should  be freed by the user program even if getline() failed
 
 		importx "getdelim" getdelim
+		#This  buffer  should  be freed by the user program even if getline() failed. more at "otoc"
 		sd ret;setcall ret getdelim(#line,#size,(asciiminus),file)
 		if ret!=-1
 			importx "sscanf" sscanf
