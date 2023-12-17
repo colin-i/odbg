@@ -8,7 +8,7 @@ OLINK=ounused
 endif
 
 ifndef linkerflags
-linkerflags=-s
+linkerflags=-O3 -s
 #-O (same as actionswf)
 endif
 
