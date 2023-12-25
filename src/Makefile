@@ -17,14 +17,14 @@ all: odbg
 items = main
 
 $(foreach var,$(items),$(eval obs += ${var}.o))
-$(foreach var,$(items),$(eval logs += ${var}.s.log))
+$(foreach var,$(items),$(eval logs += ${var}.oc.log))
 
 odbg: ${obs}
 	${OLINK} ${logs}
 	@echo
 	$(CC) ${linkerflags} ${obs} -o odbg -lopython -L../osrc -lodbg
 
-%.o: %.s
+%.o: %.oc
 	${OCOMP} $< ${OFLAGS}
 
 install: all

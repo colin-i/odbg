@@ -8,7 +8,7 @@ OLINK=ounused
 endif
 
 ifndef linkerflags
-linkerflags=-O1 -s
+linkerflags=-O3 -s
 endif
 
 name = odbgbot
@@ -18,14 +18,14 @@ all: ${name}
 items = main
 
 $(foreach var,$(items),$(eval obs += ${var}.o))
-$(foreach var,$(items),$(eval logs += ${var}.s.log))
+$(foreach var,$(items),$(eval logs += ${var}.oc.log))
 
 ${name}: ${obs}
 	${OLINK} ${logs}
 	@echo
 	$(CC) ${linkerflags} ${obs} -o ${name}
 
-%.o: %.s
+%.o: %.oc
 	${OCOMP} $< ${OFLAGS}
 
 install: all

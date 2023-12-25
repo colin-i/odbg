@@ -27,9 +27,9 @@ aritems = init1 init2 init3
 
 $(foreach var,$(precompile),$(eval pre += ${var}.h))
 $(foreach var,$(aritems),$(eval aobs += ${var}.o))
-$(foreach var,$(aritems),$(eval alogs += ${var}.s.log))
+$(foreach var,$(aritems),$(eval alogs += ${var}.oc.log))
 $(foreach var,$(items),$(eval obs += ${var}.o))
-$(foreach var,$(items),$(eval logs += ${var}.s.log))
+$(foreach var,$(items),$(eval logs += ${var}.oc.log))
 
 ${name}: ${exte} ${obs}
 	${OLINK} ${alogs} ${logs}
@@ -46,7 +46,7 @@ ${prebin}:
 	#./${prebin} $^ $*
 	./${prebin} $^ $@
 
-%.o: %.s
+%.o: %.oc
 	${OCOMP} $< ${OFLAGS}
 
 install: all
