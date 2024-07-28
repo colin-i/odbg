@@ -122,7 +122,7 @@ function memorize_line(ss cursor,sv storer)
 	elseif cursor#=(log_pathfolder)
 		inc cursor
 		importx "chdir" chdir
-		sd ret
+		datax ret#1
 		setcall ret chdir(cursor)
 		return ret
 	endelseif
