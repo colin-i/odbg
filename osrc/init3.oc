@@ -1,15 +1,15 @@
 
 format elfobj64
 
-include "common.h"
+include "common.oh"
 
-include "header.h"
+include "header.oh"
 function line()
 	datax nr#1
 	datax reg#1
 endfunction
 
-einclude  "/usr/include/ocompiler/logs.h"
+einclude  "/usr/include/ocompiler/logs.oh"
 
 function files()
 	value pointer=0

@@ -1,9 +1,9 @@
 
 format elfobj64
 
-include "elf.h"
+include "elf.oh"
 
-include "common.h"
+include "common.oh"
 
 const PTRACE_PEEKTEXT=1
 const PTRACE_POKETEXT=4

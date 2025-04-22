@@ -25,7 +25,7 @@ precompile = elf
 items = init
 aritems = init1 init2 init3
 
-$(foreach var,$(precompile),$(eval pre += ${var}.h))
+$(foreach var,$(precompile),$(eval pre += ${var}.oh))
 $(foreach var,$(aritems),$(eval aobs += ${var}.o))
 $(foreach var,$(aritems),$(eval alogs += ${var}.oc.log))
 $(foreach var,$(items),$(eval obs += ${var}.o))
@@ -42,7 +42,7 @@ ${exte}: ${prebin} ${pre} ${aobs}
 ${prebin}:
 	$(CC) a.c -o ${prebin}
 
-%.h: %.pre
+%.oh: %.pre
 	#./${prebin} $^ $*
 	./${prebin} $^ $@
 

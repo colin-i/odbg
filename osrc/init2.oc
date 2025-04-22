@@ -1,9 +1,9 @@
 
 format elfobj64
 
-include "elf.h"
+include "elf.oh"
 
-include "common.h"
+include "common.oh"
 
 #er=-1
 function get_section(sd file,sv p_mem,sv p_end)

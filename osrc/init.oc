@@ -1,9 +1,9 @@
 
 format elfobj64
 
-include "common.h"
+include "common.oh"
 
-include "header.h"
+include "header.oh"
 
 const PTRACE_TRACEME=0
 
