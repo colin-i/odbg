@@ -60,4 +60,5 @@ FILE*f=fopen(file,"wb");
 //	int offset=WEXITSTATUS(system(a));
 	ws=system(a);if(WIFEXITED(ws))if(WEXITSTATUS(ws)!=0)exit(1);
 	unlink(a);
+	return 0;
 }
