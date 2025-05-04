@@ -4,25 +4,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-void main(int argc,char**argv){
+int main(int argc,char**argv){
 	char*n=argv[1];
-	FILE*pre=fopen(n,"rb");
-	char*bf=NULL;size_t sz;
-	sz=getline(&bf,&sz,pre);
+	FILE*pre=fopen(n,"rb");if(pre==NULL)exit(1);
+	char*bf=NULL;ssize_t sz;
+	sz=getline(&bf,&sz,pre);if(sz==-1)exit(1);
 	bf[sz-1]='\0';
-	long p=ftell(pre);
+	long p=ftell(pre);if(p==-1)exit(1);
 	fseek(pre,0,SEEK_END);
-	long p2=ftell(pre);
+	long p2=ftell(pre);if(p2==-1)exit(1);
 	fseek(pre,p,SEEK_SET);
 	p2-=p;
-	char*mem=malloc(p2);
+	char*mem=malloc(p2);if(mem==NULL)exit(1);
 	fread(mem,p2,1,pre);
 	fclose(pre);
 
 	char*tfile="tempfile.c";
-	FILE*f=fopen(tfile,"wb");
+	FILE*f=fopen(tfile,"wb");if(f==NULL)exit(1);
 
-	fprintf(f,R"(
+	int whatout=fprintf(f,R"(
 #include <%s>
 #include <stddef.h>
 #include <stdio.h>
@@ -30,7 +30,7 @@ void main(int argc,char**argv){
 void main(){
 char*file="%s";
 FILE*f=fopen(file,"wb");
-)",bf,argv[2]);
+)",bf,argv[2]);if(whatout<0)exit(1);
 	free(bf);
 
 	char*s=mem;char*ante;
@@ -41,21 +41,23 @@ FILE*f=fopen(file,"wb");
 			int j=i-1;
 			int show_size=mem[j]==',';
 			if(show_size)mem[j]='\0';
-			fprintf(f,"fprintf(f,\"const %s_%s=%%lu\\n\",offsetof(%s, %s));\n",ante,s,ante,s);
-			if(show_size)fprintf(f,"fprintf(f,\"const %s_%s_size=%%lu\\n\",member_size(%s, %s));\n",ante,s,ante,s);
+			whatout=fprintf(f,"fprintf(f,\"const %s_%s=%%lu\\n\",offsetof(%s, %s));\n",ante,s,ante,s);if(whatout<0)exit(1);
+			if(show_size){
+				whatout=fprintf(f,"fprintf(f,\"const %s_%s_size=%%lu\\n\",member_size(%s, %s));\n",ante,s,ante,s);if(whatout<0)exit(1);
+			}
 		}
 		s=&mem[i+1];
 	}
 	free(mem);
 
-	fprintf(f,R"(fclose(f);
-})");
+	whatout=fprintf(f,R"(fclose(f);
+})");if(whatout<0)exit(1);
 
 	fclose(f);
-	system("cc tempfile.c");
+	int ws=system("cc tempfile.c");if(WIFEXITED(ws))if(WEXITSTATUS(ws)!=0)exit(1);
 	unlink(tfile);
 	char*a="./a.out";
 //	int offset=WEXITSTATUS(system(a));
-	system(a);
+	ws=system(a);if(WIFEXITED(ws))if(WEXITSTATUS(ws)!=0)exit(1);
 	unlink(a);
 }
